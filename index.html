@@ -6,12 +6,12 @@
 </head>
 <body>
 <h1>Hello ton! 123</h1>
-<div id="connect"></div>
+<!--<div id="connect"></div>-->
 <script>
-    // const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    //     manifestUrl: 'https://eantonov70.github.io/blank/tonconnect-manifest.json',
-    //     buttonRootId: 'connect'
-    // });
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://eantonov70.github.io/blank/tonconnect-manifest.json',
+        // buttonRootId: 'connect'
+    });
 
     async function connectToWallet() {
         const connectedWallet = await tonConnectUI.connectWallet();
