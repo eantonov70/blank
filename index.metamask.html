@@ -8,7 +8,19 @@
 <h1>Hello metamask!</h1>
 <div id="connect"></div>
 <script>
-    alert(1);
+    const MMSDK = new MetaMaskSDK.MetaMaskSDK({
+        dappMetadata: {
+            name: "Example Pure JS Dapp",
+            url: window.location.href,
+        },
+    });
+    // Because the init process of MetaMask SDK is async.
+    setTimeout(() => {
+        // You can also access via window.ethereum.
+        const ethereum = MMSDK.getProvider();
+
+        ethereum.request({ method: 'eth_requestAccounts' });
+    }, 0);
 </script>
 </body>
 </html>
