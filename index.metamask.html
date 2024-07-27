@@ -19,6 +19,8 @@
         // You can also access via window.ethereum.
         const ethereum = MMSDK.getProvider();
 
+        console.log(ethereum);
+
         ethereum.request({ method: 'eth_requestAccounts' });
     }, 0);
 
