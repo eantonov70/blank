@@ -12,7 +12,7 @@
         dappMetadata: {
             name: "Example Pure JS Dapp",
             url: window.location.href,
-        },
+        }
     });
     // Because the init process of MetaMask SDK is async.
     setTimeout(() => {
@@ -21,6 +21,8 @@
 
         ethereum.request({ method: 'eth_requestAccounts' });
     }, 0);
+
+    ethereum.disconnect();
 </script>
 </body>
 </html>
