@@ -5,61 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MetaMask Auth Example</title>
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #account { margin-top: 20px; }
+        #balance { margin-top: 20px; }
+    </style>
 </head>
 <body>
 <h1>Авторизация через MetaMask</h1>
-<button id="connectButton">Подключить MetaMask</button>
-<button id="disconnectButton" style="display:none;">Отключить MetaMask</button>
-<h2>Баланс: <span id="balance">0 BNB</span></h2>
+<button id="authButton">Подключить MetaMask</button>
+<div id="account"></div>
+<div id="balance"></div>
 
 <script>
-    const connectButton = document.getElementById('connectButton');
-    const disconnectButton = document.getElementById('disconnectButton');
-    const balanceDisplay = document.getElementById('balance');
+    // Настройки Web3
+    const provider = new Web3.providers.HttpProvider('https://data-seed-prebsc-1-s1.binance.org:8545');
+    const web3 = new Web3(provider);
 
-    let web3;
-    let userAccount;
+    let account;
 
-    // Проверка наличия MetaMask
-    if (typeof window.ethereum !== 'undefined') {
-        web3 = new Web3(window.ethereum);
-    } else {
-        alert('Пожалуйста, установите MetaMask!');
-    }
-
-    // Подключение к MetaMask
-    connectButton.addEventListener('click', async () => {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAccount = accounts[0];
-            connectButton.style.display = 'none';
-            disconnectButton.style.display = 'block';
-            updateBalance();
-        } catch (error) {
-            console.error(error);
-        }
-    });
-
-    // Отключение MetaMask
-    disconnectButton.addEventListener('click', () => {
-        userAccount = null;
-        connectButton.style.display = 'block';
-        disconnectButton.style.display = 'none';
-        balanceDisplay.innerText = '0 BNB';
-    });
-
-    // Обновление баланса пользователя
-    async function updateBalance() {
-        if (userAccount) {
-            const balanceWei = await web3.eth.getBalance(userAccount);
-            const balance = web3.utils.fromWei(balanceWei, 'ether');
-            balanceDisplay.innerText = `${balance} BNB`;
+    async function connectWallet() {
+        if (window.ethereum) {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                updateUI();
+            } catch (error) {
+                console.error("Ошибка при подключении:", error);
+            }
+        } else {
+            alert("Пожалуйста, установите MetaMask!");
         }
     }
 
-    // Установка провайдера на тестовую сеть BSC
-    const bscTestnetUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
-    web3.setProvider(new Web3.providers.HttpProvider(bscTestnetUrl));
+    async function disconnectWallet() {
+        account = null;
+        updateUI();
+    }
+
+    async function getBalance() {
+        if (account) {
+            const balance = await web3.eth.getBalance(account);
+            const balanceInEther = web3.utils.fromWei(balance, 'ether');
+            document.getElementById('balance').innerText = `Баланс: ${balanceInEther} BNB`;
+        }
+    }
+
+    function updateUI() {
+        const accountDiv = document.getElementById('account');
+        const balanceDiv = document.getElementById('balance');
+        const authButton = document.getElementById('authButton');
+
+        if (account) {
+            accountDiv.innerText = `Подключенный аккаунт: ${account}`;
+            authButton.innerText = "Отключить MetaMask";
+            authButton.onclick = disconnectWallet;
+            getBalance();
+        } else {
+            accountDiv.innerText = '';
+            balanceDiv.innerText = '';
+            authButton.innerText = "Подключить MetaMask";
+            authButton.onclick = connectWallet;
+        }
+    }
+
+    // Обработчик события изменения аккаунта в MetaMask
+    window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) {
+            account = accounts[0];
+            updateUI();
+        } else {
+            disconnectWallet();
+        }
+    });
+
+    // Начальная инициализация
+    updateUI();
 </script>
 </body>
 </html>
