@@ -23,7 +23,10 @@
 
     connectButton.onclick = async () => {
         if (typeof window.ethereum !== 'undefined') {
+            // Подключаемся к тестовой сети BSC
+            const bscTestnetProvider = new ethers.providers.JsonRpcProvider('https://data-seed-prebsc-1-s1.binance.org:8545/');
             provider = new ethers.providers.Web3Provider(window.ethereum);
+
             try {
                 // Запрашиваем доступ к аккаунтам
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -34,9 +37,9 @@
                 disconnectButton.style.display = 'block';
 
                 // Получаем баланс кошелька пользователя
-                const balance = await provider.getBalance(address);
+                const balance = await bscTestnetProvider.getBalance(address);
                 const formattedBalance = ethers.utils.formatEther(balance);
-                balance.innerText = `Balance: ${formattedBalance} ETH`;
+                balance.innerText = `Balance: ${formattedBalance} BNB`;
             } catch (error) {
                 console.error("Error connecting:", error);
                 status.innerText = 'Connection failed';
