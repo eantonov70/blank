@@ -11,11 +11,13 @@
 <button id="connectButton">Connect MetaMask</button>
 <button id="disconnectButton" style="display: none;">Disconnect</button>
 <p id="status"></p>
+<p id="balance"></p>
 
 <script>
     const connectButton = document.getElementById('connectButton');
     const disconnectButton = document.getElementById('disconnectButton');
     const status = document.getElementById('status');
+    const balance = document.getElementById('balance');
     let provider;
     let signer;
 
@@ -30,6 +32,11 @@
                 status.innerText = `Connected: ${address}`;
                 connectButton.style.display = 'none';
                 disconnectButton.style.display = 'block';
+
+                // Получаем баланс кошелька пользователя
+                const balance = await provider.getBalance(address);
+                const formattedBalance = ethers.utils.formatEther(balance);
+                balance.innerText = `Balance: ${formattedBalance} ETH`;
             } catch (error) {
                 console.error("Error connecting:", error);
                 status.innerText = 'Connection failed';
@@ -43,6 +50,7 @@
         provider = null;
         signer = null;
         status.innerText = 'Disconnected';
+        balance.innerText = '';
         connectButton.style.display = 'block';
         disconnectButton.style.display = 'none';
     };
