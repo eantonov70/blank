@@ -1,48 +1,51 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторизация через MetaMask</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+    <title>MetaMask Integration</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.umd.min.js"></script>
 </head>
 <body>
-<h1>Авторизация через MetaMask</h1>
-<button id="connectButton">Подключить MetaMask</button>
-<p id="accountDisplay"></p>
+<h1>MetaMask Authentication</h1>
+<button id="connectButton">Connect MetaMask</button>
+<button id="disconnectButton" style="display: none;">Disconnect</button>
+<p id="status"></p>
 
 <script>
     const connectButton = document.getElementById('connectButton');
-    const accountDisplay = document.getElementById('accountDisplay');
+    const disconnectButton = document.getElementById('disconnectButton');
+    const status = document.getElementById('status');
+    let provider;
+    let signer;
 
-    // Проверяем, доступен ли Ethereum объект (MetaMask)
-    if (typeof window.ethereum !== 'undefined') {
-        console.log('MetaMask найден!');
-        connectButton.addEventListener('click', async () => {
+    connectButton.onclick = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
             try {
-                // Запросить доступ к учетной записи
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                // Отобразить адрес первой учетной записи
-                accountDisplay.innerText = 'Подключенный аккаунт: ' + accounts[0];
+                // Запрашиваем доступ к аккаунтам
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                signer = provider.getSigner();
+                const address = await signer.getAddress();
+                status.innerText = `Connected: ${address}`;
+                connectButton.style.display = 'none';
+                disconnectButton.style.display = 'block';
             } catch (error) {
-                console.error('Ошибка при подключении:', error);
-                accountDisplay.innerText = 'Ошибка при подключении: ' + error.message;
+                console.error("Error connecting:", error);
+                status.innerText = 'Connection failed';
             }
-        });
-    } else {
-        console.log('MetaMask не установлен!');
-        accountDisplay.innerText = 'Пожалуйста, установите MetaMask!';
-    }
+        } else {
+            status.innerText = 'MetaMask is not installed!';
+        }
+    };
+
+    disconnectButton.onclick = () => {
+        provider = null;
+        signer = null;
+        status.innerText = 'Disconnected';
+        connectButton.style.display = 'block';
+        disconnectButton.style.display = 'none';
+    };
 </script>
 </body>
 </html>
