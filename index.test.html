@@ -3,67 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WalletConnect Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.6.6/dist/umd/index.min.js"></script>
+    <title>Авторизация через MetaMask</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<button id="connectButton">Подключить кошелек</button>
+<h1>Авторизация через MetaMask</h1>
+<button id="connectButton">Подключить MetaMask</button>
+<p id="accountDisplay"></p>
+
 <script>
-    // Создаем экземпляр WalletConnect
-    const connector = new WalletConnect.default({
-        bridge: "https://bridge.walletconnect.org", // URL моста
-    });
+    const connectButton = document.getElementById('connectButton');
+    const accountDisplay = document.getElementById('accountDisplay');
 
-    // Получаем кнопку
-    const connectButton = document.getElementById("connectButton");
-
-    // Обработчик события нажатия на кнопку
-    connectButton.addEventListener("click", async () => {
-        // Проверяем, подключен ли уже кошелек
-        if (!connector.connected) {
-            // Создаем сессию
-            await connector.createSession();
-
-            // Получаем URI для QR-кода
-            const uri = connector.uri;
-            console.log(uri);
-
-            // Выводим URI в консоль или используем его для отображения QR-кода
-            // Например, вы можете использовать библиотеку для генерации QR-кода
-            // window.open(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(uri)}`);
-
-            // Подписываемся на события
-            connector.on("connect", (error, payload) => {
-                if (error) {
-                    throw error;
-                }
-
-                // Получаем аккаунт и сеть
-                const { accounts, chainId } = payload.params[0];
-                console.log("Connected", accounts, chainId);
-            });
-
-            connector.on("session_update", (error, payload) => {
-                if (error) {
-                    throw error;
-                }
-
-                // Получаем обновленные аккаунты и сеть
-                const { accounts, chainId } = payload.params[0];
-                console.log("Session updated", accounts, chainId);
-            });
-
-            connector.on("disconnect", (error, payload) => {
-                if (error) {
-                    throw error;
-                }
-
-                console.log("Disconnected");
-            });
-        } else {
-            console.log("Кошелек уже подключен");
-        }
-    });
+    // Проверяем, доступен ли Ethereum объект (MetaMask)
+    if (typeof window.ethereum !== 'undefined') {
+        console.log('MetaMask найден!');
+        connectButton.addEventListener('click', async () => {
+            try {
+                // Запросить доступ к учетной записи
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                // Отобразить адрес первой учетной записи
+                accountDisplay.innerText = 'Подключенный аккаунт: ' + accounts[0];
+            } catch (error) {
+                console.error('Ошибка при подключении:', error);
+                accountDisplay.innerText = 'Ошибка при подключении: ' + error.message;
+            }
+        });
+    } else {
+        console.log('MetaMask не установлен!');
+        accountDisplay.innerText = 'Пожалуйста, установите MetaMask!';
+    }
 </script>
 </body>
 </html>
