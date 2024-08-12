@@ -1,24 +1,69 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <title>Connect to crypto wallet</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalletConnect Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.6.6/dist/umd/index.min.js"></script>
 </head>
 <body>
+<button id="connectButton">Подключить кошелек</button>
 <script>
-    /* To connect using MetaMask */
-    async function connect() {
-        if (window.ethereum) {
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-            window.web3 = new Web3(window.ethereum);
-            const account = web3.eth.accounts;
-            //Get the current MetaMask selected/active wallet
-            console.log(`Wallet: ${account}`);
+    // Создаем экземпляр WalletConnect
+    const connector = new WalletConnect.default({
+        bridge: "https://bridge.walletconnect.org", // URL моста
+    });
 
+    // Получаем кнопку
+    const connectButton = document.getElementById("connectButton");
+
+    // Обработчик события нажатия на кнопку
+    connectButton.addEventListener("click", async () => {
+        // Проверяем, подключен ли уже кошелек
+        if (!connector.connected) {
+            // Создаем сессию
+            await connector.createSession();
+
+            // Получаем URI для QR-кода
+            const uri = connector.uri;
+            console.log(uri);
+
+            // Выводим URI в консоль или используем его для отображения QR-кода
+            // Например, вы можете использовать библиотеку для генерации QR-кода
+            // window.open(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(uri)}`);
+
+            // Подписываемся на события
+            connector.on("connect", (error, payload) => {
+                if (error) {
+                    throw error;
+                }
+
+                // Получаем аккаунт и сеть
+                const { accounts, chainId } = payload.params[0];
+                console.log("Connected", accounts, chainId);
+            });
+
+            connector.on("session_update", (error, payload) => {
+                if (error) {
+                    throw error;
+                }
+
+                // Получаем обновленные аккаунты и сеть
+                const { accounts, chainId } = payload.params[0];
+                console.log("Session updated", accounts, chainId);
+            });
+
+            connector.on("disconnect", (error, payload) => {
+                if (error) {
+                    throw error;
+                }
+
+                console.log("Disconnected");
+            });
         } else {
-            console.log("No wallet");
+            console.log("Кошелек уже подключен");
         }
-    }
+    });
 </script>
-<input type="button" value="Connect Wallet" onclick="connect();">
 </body>
 </html>
