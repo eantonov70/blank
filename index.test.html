@@ -1,25 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Some title</title>
-    <script src="https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/cdn/metamask-sdk.js"></script>
+    <title>Connect to crypto wallet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
 </head>
 <body>
-<h1>Hello ton!</h1>
-<div id="connect"></div>
 <script>
-    const MMSDK = new MetaMaskSDK.MetaMaskSDK({
-        dappMetadata: {
-            name: "JavaScript example dapp",
-            url: window.location.href,
-        },
-        // Other options.
-    })
+    /* To connect using MetaMask */
+    async function connect() {
+        if (window.ethereum) {
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            window.web3 = new Web3(window.ethereum);
+            const account = web3.eth.accounts;
+            //Get the current MetaMask selected/active wallet
+            const walletAddress = account.givenProvider.selectedAddress;
+            console.log(`Wallet: ${walletAddress}`);
 
-    // You can also access via window.ethereum.
-    const ethereum = MMSDK.getProvider()
-
-    ethereum.request({ method: "eth_requestAccounts", params: [] })
+        } else {
+            console.log("No wallet");
+        }
+    }
 </script>
+<input type="button" value="Connect Wallet" onclick="connect();">
 </body>
 </html>
