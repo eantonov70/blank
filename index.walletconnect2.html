@@ -12,29 +12,25 @@
 <div id="account"></div>
 
 <script>
-    // Шаг 2: Создайте провайдер WalletConnect
-    const provider = new WalletConnectProvider.default({
-        rpc: {
-            97: "https://data-seed-prebsc-1-s1.binance.org:8545/" // URL для тестовой сети BNB
-        },
-        chainId: 97, // ID тестовой сети BNB
-    });
+    import { Core } from '@walletconnect/core'
+    import { Web3Wallet } from '@walletconnect/web3wallet'
 
-    // Шаг 3: Обработчик кнопки подключения
-    document.getElementById("connectButton").onclick = async () => {
-        // Проверяем, подключен ли WalletConnect
-        if (!provider.connected) {
-            // Подключаем кошелек
-            await provider.enable();
-        }
+    const core = new Core({
+        projectId: 'd3bb25a0ee77efefbbfeca12b68376f4'
+    })
 
-        // Создаем экземпляр Web3
-        const web3 = new Web3(provider);
+    const metadata = {
+        name: 'walletconnect2.html',
+        description: 'AppKit Example',
+        url: 'https://web3modal.com', // origin must match your domain & subdomain
+        icons: ['https://avatars.githubusercontent.com/u/37784886']
+    }
 
-        // Получаем аккаунты
-        const accounts = await web3.eth.getAccounts();
-        document.getElementById("account").innerText = `Подключенный аккаунт: ${accounts[0]}`;
-    };
+    const web3wallet = await Web3Wallet.init({
+        core, // <- pass the shared 'core' instance
+        metadata
+    })
+
 </script>
 </body>
 </html>
