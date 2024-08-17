@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalletConnect Example</title>
+</head>
+<body>
+<h1>Интеграция WalletConnect с MetaMask</h1>
+<button id="connectButton">Подключить WalletConnect</button>
+<div id="account"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+<script>
+    const connectButton = document.getElementById('connectButton');
+    const accountDiv = document.getElementById('account');
+
+    // Создаем провайдер WalletConnect
+    const provider = new WalletConnectProvider.default({
+        rpc: {
+            3: "https://ropsten.infura.io/v3/YOUR_INFURA_PROJECT_ID" // Используйте тестовую сеть Ropsten
+        },
+        chainId: 3 // Указываем ID тестовой сети
+    });
+
+    connectButton.onclick = async () => {
+        // Проверяем, подключен ли WalletConnect
+        if (!provider.connected) {
+            // Подключаемся
+            await provider.enable();
+        }
+
+        // Создаем экземпляр Web3
+        const web3 = new Web3(provider);
+
+        // Получаем аккаунты
+        const accounts = await web3.eth.getAccounts();
+        accountDiv.innerText = `Подключенный аккаунт: ${accounts[0]}`;
+    };
+</script>
+</body>
+</html>
