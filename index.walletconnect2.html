@@ -3,40 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WalletConnect Example</title>
+    <title>WalletConnect UI Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/@walletconnect/web3-provider/dist/umd/index.min.js">
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 </head>
 <body>
-<h1>Интеграция WalletConnect с MetaMask</h1>
-<button id="connectButton">Подключить WalletConnect</button>
-<div id="account"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+<button id="connectButton">Подключить кошелек</button>
 <script>
-    const connectButton = document.getElementById('connectButton');
-    const accountDiv = document.getElementById('account');
-
-    // Создаем провайдер WalletConnect
+    // Создайте провайдер WalletConnect
     const provider = new WalletConnectProvider.default({
         rpc: {
-            3: "https://ropsten.infura.io/v3/YOUR_INFURA_PROJECT_ID" // Используйте тестовую сеть Ropsten
+            3: "https://ropsten.infura.io/v3/YOUR_INFURA_PROJECT_ID", // Тестовая сеть Ropsten
         },
-        chainId: 3 // Указываем ID тестовой сети
+        chainId: 3,
     });
 
-    connectButton.onclick = async () => {
-        // Проверяем, подключен ли WalletConnect
+    // Обработчик события для кнопки подключения
+    document.getElementById('connectButton').onclick = async () => {
+        // Проверка, подключен ли WalletConnect
         if (!provider.connected) {
-            // Подключаемся
+            // Подключение к кошельку с отображением UI
             await provider.enable();
         }
 
-        // Создаем экземпляр Web3
+        // Создание экземпляра Web3
         const web3 = new Web3(provider);
 
-        // Получаем аккаунты
+        // Получение адреса аккаунта
         const accounts = await web3.eth.getAccounts();
-        accountDiv.innerText = `Подключенный аккаунт: ${accounts[0]}`;
+        console.log("Подключенный аккаунт:", accounts[0]);
     };
 </script>
 </body>
