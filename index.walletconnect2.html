@@ -3,36 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WalletConnect UI Example</title>
-    <script src="https://unpkg.com/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
+    <title>WalletConnect Integration</title>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 </head>
 <body>
 <button id="connectButton">Подключить кошелек</button>
+<div id="account"></div>
+
 <script>
-    // Создайте провайдер WalletConnect
+    // Шаг 2: Создайте провайдер WalletConnect
     const provider = new WalletConnectProvider.default({
         rpc: {
-            3: "https://ropsten.infura.io/v3/YOUR_INFURA_PROJECT_ID", // Тестовая сеть Ropsten
+            97: "https://data-seed-prebsc-1-s1.binance.org:8545/" // URL для тестовой сети BNB
         },
-        chainId: 3,
+        chainId: 97, // ID тестовой сети BNB
     });
 
-    // Обработчик события для кнопки подключения
-    document.getElementById('connectButton').onclick = async () => {
-        // Проверка, подключен ли WalletConnect
+    // Шаг 3: Обработчик кнопки подключения
+    document.getElementById("connectButton").onclick = async () => {
+        // Проверяем, подключен ли WalletConnect
         if (!provider.connected) {
-            // Подключение к кошельку с отображением UI
+            // Подключаем кошелек
             await provider.enable();
         }
 
-        // Создание экземпляра Web3
+        // Создаем экземпляр Web3
         const web3 = new Web3(provider);
 
-        // Получение адреса аккаунта
+        // Получаем аккаунты
         const accounts = await web3.eth.getAccounts();
-        console.log("Подключенный аккаунт:", accounts[0]);
+        document.getElementById("account").innerText = `Подключенный аккаунт: ${accounts[0]}`;
     };
 </script>
 </body>
